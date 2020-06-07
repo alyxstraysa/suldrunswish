@@ -1,1 +1,1 @@
-web: gunicorn wsgi:app
+web: gunicorn app:app  --preload --workers 1
