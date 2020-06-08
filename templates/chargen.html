@@ -1,0 +1,17 @@
+{% extends "index.html" %} {% block content %}
+
+<div class="card border-primary mb-3" style="max-width: 40rem;">
+  <div class="card-body">
+    <h4 class="card-title">Character Generation</h4>
+    <form method="POST" action="{{url_for('post_to_db')}}">
+      <label for="fname">First name:</label><br />
+      <input type="text" id="fname" name="fname" /><br />
+      <label for="lname">Last name:</label><br />
+      <input type="text" id="lname" name="lname" /><br />
+      <br />
+      <button type="submit">Save Character</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

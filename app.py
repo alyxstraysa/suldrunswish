@@ -1,8 +1,10 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, url_for
 #from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/pre-registration'
 #db = SQLAlchemy(app)
 
@@ -38,9 +40,19 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/chargen')
+def chargen():
+    return render_template('chargen.html')
+
+
 @app.route('/example')
 def example():
     return render_template('example.html')
+
+
+@app.route("/submit", methods=["POST"])
+def post_to_db():
+    pass
 
 
 if __name__ == '__main__':
