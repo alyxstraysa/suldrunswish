@@ -1,48 +1,36 @@
 from flask import Flask, request, jsonify, render_template
+from flask_sqlalchemy import SQLAlchemy
+import os
+
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/pre-registration'
+db = SQLAlchemy(app)
 
 
-@app.route('/getmsg/', methods=['GET'])
-def respond():
-    # Retrieve the name from url parameter
-    name = request.args.get("name", None)
+class User(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True)
 
-    # For debugging
-    print(f"got name {name}")
+    def __init__(self, email):
+        self.email = email
 
-    response = {}
-
-    # Check if user sent a name at all
-    if not name:
-        response["ERROR"] = "no name found, please send a name."
-    # Check if the user entered a number not a name
-    elif str(name).isdigit():
-        response["ERROR"] = "name can't be numeric."
-    # Now the user entered a valid name
-    else:
-        response["MESSAGE"] = f"Welcome {name} to our awesome platform!!"
-
-    # Return the response in json format
-    return jsonify(response)
+    def __repr__(self):
+        return '<E-mail %r>' % self.email
 
 
-@app.route('/post/', methods=['POST'])
-def post_something():
-    param = request.form.get('name')
-    print(param)
-    # You can add the test cases you made in the previous function, but in our case here you are just testing the POST functionality
-    if param:
-        return jsonify({
-            "Message": f"Welcome {name} to our awesome platform!!",
-            # Add this option to distinct the POST request
-            "METHOD": "POST"
-        })
-    else:
-        return jsonify({
-            "ERROR": "no name found, please send a name."
-        })
-
-# A welcome message to test our server
+@app.route('/prereg', methods=['POST'])
+def prereg():
+    email = None
+    if request.method == 'POST':
+        email = request.form['email']
+        # Check that email does not already exist (not a great query, but works)
+        if not db.session.query(User).filter(User.email == email).count():
+            reg = User(email)
+            db.session.add(reg)
+            db.session.commit()
+            return render_template('success.html')
+    return render_template('index.html')
 
 
 @app.route('/')
@@ -50,6 +38,12 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/example')
+def example():
+    return render_template('example.html')
+
+
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
+    app.config['DEBUG'] = True
     app.run(threaded=True, port=5000)
