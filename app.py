@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify, render_template, url_for
 #from flask_sqlalchemy import SQLAlchemy
 import os
+import pandas as pd
+import numpy as np
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -43,6 +45,14 @@ def index():
 @app.route('/chargen')
 def chargen():
     return render_template('chargen.html')
+
+
+@app.route('/background')
+def background():
+    backgrounds = pd.read_csv("static/generators/backstories.csv")
+    random_background = backgrounds.loc[np.random.randint(
+        len(backgrounds))].iat[0]
+    return render_template('background.html', random_background=random_background)
 
 
 @app.route('/example')
