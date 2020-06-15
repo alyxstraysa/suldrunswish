@@ -35,12 +35,12 @@ def background():
 
 @app.route('/charlist')
 def charlist():
-    cur = conn.cursor()
-    cur.execute(
-        """SELECT * FROM inventory"""
-    )
-    result = cur.fetchall()
-    print(result)
+    #cur = conn.cursor()
+    # cur.execute(
+    #    """SELECT * FROM inventory"""
+    # )
+    #result = cur.fetchall()
+    # print(result)
 
     URL = "https://mysterious-tor-57369.herokuapp.com/api/1"
     r = requests.get(URL)
