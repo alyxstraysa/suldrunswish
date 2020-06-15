@@ -7,11 +7,15 @@ import psycopg2
 import json
 import requests
 import sys
+import flask_login
 
 # create_tables(conn)
 # edit_tables(conn)
 # add_inventory(conn)
+
 app = Flask(__name__)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 
 @app.route('/')
@@ -41,7 +45,7 @@ def charlist():
     #result = cur.fetchall()
     # print(result)
 
-    URL = "https://mysterious-tor-57369.herokuapp.com/api/characters"
+    URL = "https://mysterious-tor-57369.herokuapp.com/api/character"
     r = requests.get(URL)
     char_list = r.json()
     print(char_list)
