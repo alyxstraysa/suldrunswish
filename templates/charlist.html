@@ -1,0 +1,37 @@
+{% extends "index.html" %} {% block jsload %}
+
+<script src="/static/js/chargen.js"></script>
+
+{% endblock %} {% block content %}
+
+<div class="card border-primary mb-3" style="max-width: 40rem;">
+    <div class="card-body">
+        <h4 class="card-title">Character List</h4>
+
+        <p>
+            <i>{{char_list['charactername']}}</i>
+            <br />
+            Str {{char_list['strength']}}, Dex {{char_list['dexterity']}}, Con
+            {{char_list['constitution']}}, Int {{char_list['intelligence']}},
+            Wis
+            {{char_list['wisdom']}}, Cha {{char_list['charisma']}};
+            <br />
+            ST {{char_list['savingthrow']}}, HP {{char_list['hitdie']}}, AC
+            {{char_list['armorclass']}}, MV {{char_list['movement']}}, AV
+            {{char_list['attackvalue']}}, {{char_list['languages']}}, Initiative
+            {{char_list['initiative']}}
+            <br />
+
+            {% if char_list['class'] == 'Strong' %}
+            I am a big strong warrior.
+            {% elif char_list['class'] == 'Wise' %}
+            I am a dumb wizard.
+            {% else %}
+            I am a dumb rogue.
+            {% endif %}
+
+        </p>
+    </div>
+</div>
+
+{% endblock %}

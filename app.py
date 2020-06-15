@@ -4,8 +4,14 @@ import os
 import pandas as pd
 import numpy as np
 import psycopg2
-from tables import create_tables
+from tables import create_tables, edit_tables, add_inventory
+import json
+import requests
+import sys
 
+# create_tables(conn)
+# edit_tables(conn)
+# add_inventory(conn)
 app = Flask(__name__)
 
 
@@ -27,9 +33,22 @@ def background():
     return render_template('background.html', random_background=random_background)
 
 
-@app.route('/example')
-def example():
-    return render_template('example.html')
+@app.route('/charlist')
+def charlist():
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT * FROM inventory"""
+    )
+    result = cur.fetchall()
+    print(result)
+
+    URL = "https://mysterious-tor-57369.herokuapp.com/api/1"
+    r = requests.get(URL)
+    char_list = r.json()
+    print(char_list)
+    sys.stdout.flush()
+
+    return render_template('charlist.html', char_list=char_list)
 
 
 @app.route("/submit", methods=["POST"])
