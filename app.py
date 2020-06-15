@@ -4,7 +4,6 @@ import os
 import pandas as pd
 import numpy as np
 import psycopg2
-from tables import create_tables, edit_tables, add_inventory
 import json
 import requests
 import sys
@@ -42,7 +41,7 @@ def charlist():
     #result = cur.fetchall()
     # print(result)
 
-    URL = "https://mysterious-tor-57369.herokuapp.com/api/1"
+    URL = "https://mysterious-tor-57369.herokuapp.com/api/characters"
     r = requests.get(URL)
     char_list = r.json()
     print(char_list)
