@@ -4,12 +4,18 @@ import psycopg2
 def create_tables(conn):
     command = (
         """
-        DROP TABLE inventory;
+        DROP TABLE IF EXISTS inventory;
 
-        CREATE TABLE IF NOT EXISTS inventory (
+        CREATE TABLE IF NOT EXISTS char_list (
             char_id SERIAL PRIMARY KEY,
             char_name VARCHAR(255) NOT NULL
         );
+
+        CREATE TABLE IF NOT EXISTS char_list (
+            char_id SERIAL PRIMARY KEY,
+            char_name VARCHAR(255) NOT NULL
+        );
+
         """)
     cur = conn.cursor()
     cur.execute(command)

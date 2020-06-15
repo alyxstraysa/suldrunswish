@@ -8,29 +8,30 @@
     <div class="card-body">
         <h4 class="card-title">Character List</h4>
 
+        {% for character in char_list %}
         <p>
-            <i>{{char_list['charactername']}}</i>
+            <i>{{character['charactername']}}</i>
             <br />
-            Str {{char_list['strength']}}, Dex {{char_list['dexterity']}}, Con
-            {{char_list['constitution']}}, Int {{char_list['intelligence']}},
+            Str {{character['strength']}}, Dex {{character['dexterity']}}, Con
+            {{character['constitution']}}, Int {{character['intelligence']}},
             Wis
-            {{char_list['wisdom']}}, Cha {{char_list['charisma']}};
+            {{character['wisdom']}}, Cha {{character['charisma']}};
             <br />
-            ST {{char_list['savingthrow']}}, HP {{char_list['hitdie']}}, AC
-            {{char_list['armorclass']}}, MV {{char_list['movement']}}, AV
-            {{char_list['attackvalue']}}, {{char_list['languages']}}, Initiative
-            {{char_list['initiative']}}
+            ST {{character['savingthrow']}}, HP {{character['hitdie']}}, AC
+            {{character['armorclass']}}, MV {{character['movement']}}, AV
+            {{character['attackvalue']}}, {{character['languages']}}, Initiative
+            {{character['initiative']}}
             <br />
 
-            {% if char_list['class'] == 'Strong' %}
+            {% if character['class'] == 'Strong' %}
             I am a big strong warrior.
-            {% elif char_list['class'] == 'Wise' %}
+            {% elif character['class'] == 'Wise' %}
             I am a dumb wizard.
             {% else %}
             I am a dumb rogue.
             {% endif %}
-
         </p>
+        {% endfor %}
     </div>
 </div>
 
