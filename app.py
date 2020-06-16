@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify, render_template, url_for
-#from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, session, request, jsonify, render_template, url_for
+from markupsafe import escape
+from flask_login import LoginManager
 import os
 import pandas as pd
 import numpy as np
@@ -9,13 +10,17 @@ import requests
 import sys
 import flask_login
 
-# create_tables(conn)
-# edit_tables(conn)
-# add_inventory(conn)
-
 app = Flask(__name__)
+
+
+# loginmanager
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(user_id)
 
 
 @app.route('/')
@@ -57,6 +62,33 @@ def charlist():
 @app.route("/submit", methods=["POST"])
 def post_to_db():
     pass
+
+
+@app.route('/testpage')
+def test_page():
+    if 'username' in session:
+        return 'Logged in as %s' % escape(session['username'])
+    return 'You are not logged in'
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        session['username'] = request.form['username']
+        return redirect(url_for('testpage'))
+    return '''
+        <form method="post">
+            <p><input type=text name=username>
+            <p><input type=submit value=Login>
+        </form>
+    '''
+
+
+@app.route('/logout')
+def logout():
+    # remove the username from the session if it's there
+    session.pop('username', None)
+    return redirect(url_for('testpage'))
 
 
 if __name__ == '__main__':
