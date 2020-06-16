@@ -15,8 +15,14 @@ app = Flask(__name__)
 
 if os.environ.get('VIRTUAL_ENV') == '/Users/kitsundere/suldrunswish/venv':
     print("Working locally...")
+    from secret import *
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require',
+                            database=DATABASE, user=USER, password=PASSWORD)
+    print("Login Successful!")
 else:
-    pass
+    conn = psycopg2.connect(os.environ.get('DATABASE_URL_KEI'), sslmode='require',
+                            database=os.environ.get('DATABASE'), user=os.environ.get('USER'), password=os.environ.get('PASSWORD'))
+    app.logger.debug("Database connection successful!")
 
 # Login Logic
 login_manager = LoginManager()
