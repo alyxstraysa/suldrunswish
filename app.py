@@ -12,7 +12,7 @@ import sys
 import pprint
 
 app = Flask(__name__)
-pprint.pprint(dict(os.environ))
+# pprint.pprint(dict(os.environ))
 
 # Login Logic
 login_manager = LoginManager()
@@ -26,11 +26,12 @@ def load_user(user_id):
 
 @ app.route('/')
 def index():
-    app.logger.debug('this is a DEBUG message')
-    app.logger.info('this is an INFO message')
-    app.logger.warning('this is a WARNING message')
-    app.logger.error('this is an ERROR message')
-    app.logger.critical('this is a CRITICAL message')
+    app.logger.debug(os.environ.get('IS_HEROKU'))
+    # app.logger.debug('this is a DEBUG message')
+    # app.logger.info('this is an INFO message')
+    # app.logger.warning('this is a WARNING message')
+    # app.logger.error('this is an ERROR message')
+    # app.logger.critical('this is a CRITICAL message')
     return render_template('index.html')
 
 
