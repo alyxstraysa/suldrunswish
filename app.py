@@ -12,7 +12,11 @@ import sys
 import pprint
 
 app = Flask(__name__)
-# pprint.pprint(dict(os.environ))
+
+if os.environ.get('VIRTUAL_ENV') == '/Users/kitsundere/suldrunswish/venv':
+    print("Working locally...")
+else:
+    pass
 
 # Login Logic
 login_manager = LoginManager()
@@ -28,7 +32,6 @@ def load_user(user_id):
 def index():
     app.logger.debug("The environment is heroku: %s",
                      os.environ.get('IS_HEROKU'))
-    app.logger.debug('this is a DEBUG message')
     # app.logger.info('this is an INFO message')
     # app.logger.warning('this is a WARNING message')
     # app.logger.error('this is an ERROR message')
