@@ -26,6 +26,7 @@ def load_user(user_id):
 
 @ app.route('/')
 def index():
+    pprint.pprint("Is the environment heroku?")
     app.logger.debug(os.environ.get('IS_HEROKU'))
     # app.logger.debug('this is a DEBUG message')
     # app.logger.info('this is an INFO message')
