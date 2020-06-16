@@ -28,7 +28,7 @@ def load_user(user_id):
 def index():
     app.logger.debug("The environment is heroku: %s",
                      os.environ.get('IS_HEROKU'))
-    # app.logger.debug('this is a DEBUG message')
+    app.logger.debug('this is a DEBUG message')
     # app.logger.info('this is an INFO message')
     # app.logger.warning('this is a WARNING message')
     # app.logger.error('this is an ERROR message')
