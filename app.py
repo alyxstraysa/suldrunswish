@@ -149,7 +149,7 @@ def charlist():
     # result = cur.fetchall()
     # print(result)
 
-    URL = "https://mysterious-tor-57369.herokuapp.com/api/character"
+    URL = "https://mysterious-tor-57369.herokuapp.com/api/characters"
     r = requests.get(URL)
     char_list = r.json()
     return render_template('charlist.html', char_list=char_list)
