@@ -1,7 +1,11 @@
-from flask import Flask, session, request, jsonify, render_template, url_for
+from flask import Flask, session, request, jsonify, render_template, url_for, flash, redirect
+from werkzeug.security import check_password_hash
 import logging
+from forms import LoginForm
 from markupsafe import escape
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
+from werkzeug.urls import url_parse
+
 import os
 import pandas as pd
 import numpy as np
@@ -18,26 +22,103 @@ if os.environ.get('VIRTUAL_ENV') == '/Users/kitsundere/suldrunswish/venv':
     from secret import *
     conn = psycopg2.connect(DATABASE_URL, sslmode='require',
                             database=DATABASE, user=USER, password=PASSWORD)
+    app.config['SECRET_KEY'] = SECRET_KEY
     print("Login Successful!")
 else:
+    app.logger.debug("Starting database connection...")
     conn = psycopg2.connect(os.environ.get('DATABASE_URL_KEI'), sslmode='require',
                             database=os.environ.get('DATABASE'), user=os.environ.get('USER'), password=os.environ.get('PASSWORD'))
     app.logger.debug("Database connection successful!")
 
+
+class User(UserMixin):
+    def __init__(self):
+        self.user_id = None
+        self.username = None
+        self.password = None
+        self.email = None
+
+    def get_id(self):
+        return self.username
+
+
+def user_lookup(username):
+    command = (
+        """
+        SELECT *
+        FROM login
+        WHERE username = %s
+        """
+    )
+
+    data = (username,)
+    cur = conn.cursor()
+    cur.execute(command, data)
+    results = cur.fetchone()
+    cur.close()
+
+    if results == None:
+        print("No user found!")
+        return None
+    else:
+        current_user = {
+            "user_id": results[0],
+            "username": results[1],
+            "password": results[2],
+            "email": results[3]
+        }
+        return current_user
+
+
+def id_lookup(username):
+    command = (
+        """
+        SELECT *
+        FROM login
+        WHERE username = %s
+        """
+    )
+
+    data = (username,)
+    cur = conn.cursor()
+    cur.execute(command, data)
+    results = cur.fetchone()
+    cur.close()
+
+    if results == None:
+        print("No id found!")
+        return None
+    else:
+        logged_in_user_dict = {
+            "user_id": results[0],
+            "username": results[1],
+            "password": results[2],
+            "email": results[3]
+        }
+
+        logged_in_user = User()
+        logged_in_user.user_id = logged_in_user_dict['user_id']
+        logged_in_user.username = logged_in_user_dict['username']
+        logged_in_user.password = logged_in_user_dict['password']
+        logged_in_user.email = logged_in_user_dict['email']
+
+        return logged_in_user
+
+
 # Login Logic
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = 'login'
 
 
 @ login_manager.user_loader
 def load_user(user_id):
-    return UserMixin.get_id(user_id)
+    user = id_lookup(user_id)
+    return user
 
 
 @ app.route('/')
 def index():
-    app.logger.debug("The environment is heroku: %s",
-                     os.environ.get('IS_HEROKU'))
     # app.logger.info('this is an INFO message')
     # app.logger.warning('this is a WARNING message')
     # app.logger.error('this is an ERROR message')
@@ -73,9 +154,36 @@ def charlist():
     return render_template('charlist.html', char_list=char_list)
 
 
-@ app.route("/submit", methods=["POST"])
-def post_to_db():
-    pass
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('profile'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user_dict = user_lookup(username=form.username.data)
+        if user_dict is None or (check_password_hash(user_dict['password'], form.password.data) == False):
+            print("Invalid username or password!")
+            return redirect(url_for('login'))
+        user = User()
+        user.user_id = user_dict['user_id']
+        user.username = user_dict['username']
+        user.password = user_dict['password']
+        user.email = user_dict['email']
+        login_user(user, remember=form.remember_me.data)
+        return render_template('profile.html')
+    return render_template('login.html', title='Sign In', form=form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':
