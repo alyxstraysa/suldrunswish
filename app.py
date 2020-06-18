@@ -29,6 +29,7 @@ else:
     conn = psycopg2.connect(os.environ.get('DATABASE_URL_KEI'), sslmode='require',
                             database=os.environ.get('DATABASE'), user=os.environ.get('USER'), password=os.environ.get('PASSWORD'))
     app.logger.debug("Database connection successful!")
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 
 
 class User(UserMixin):
