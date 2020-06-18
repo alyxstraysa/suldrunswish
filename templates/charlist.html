@@ -23,12 +23,12 @@
             {{character['initiativebonus']}}
             <br />
 
-            {% if character['class'] == 'Strong' %}
+            {% if character['characterclass'] == 'Strong' %}
             I am a big strong warrior.
-            {% elif character['class'] == 'Wise' %}
+            {% elif character['characterclass'] == 'Wise' %}
             I am a dumb wizard.
             {% else %}
-            I am a dumb rogue.
+            I am a sneaky thief.
             {% endif %}
         </p>
         {% endfor %}
