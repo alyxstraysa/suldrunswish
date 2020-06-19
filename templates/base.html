@@ -15,8 +15,17 @@
     {% endblock %}
 </head>
 
+{% set navigation_bar = [
+    ('index', 'Index'),
+    ('chargen', 'CharGen'),
+    ('background', 'Background')
+] -%}
+
+{% set active_page = active_page|default('index') -%}
+
+
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="#">Fixed navbar</a>
+    <a class="navbar-brand" href={{url_for('index')}}>SW</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse"
         data-target="#navbarCollapse" aria-controls="navbarCollapse"
         aria-expanded="false" aria-label="Toggle navigation">
@@ -24,15 +33,25 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
+                {% for id, caption in navigation_bar %}
+                  <li {% if id == active_page %} class="nav-item active"
+                  {% else %}
+                  class = "nav-item"
+                  {% endif%}><a href="{{ url_for(id)|e }}">{{ caption|e }}</a></li>
+                {% endfor %}
+
+            <!-- <li class="nav-item active">
                 <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('profile') }}">Link</a>
+                <a class="nav-link" href="{{ url_for('chargen') }}">CharGen</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link disabled" href="#">Disabled</a>
+                <a class="nav-link" href="{{ url_for('chargen') }}">Background</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('charlist') }}">CharList</a>
+            </li> -->
         </ul>
         <div class="navbar-nav mt-2 mt-md-0">
                 {% if current_user.is_anonymous %}
