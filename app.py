@@ -161,6 +161,11 @@ def profile():
     return render_template('profile.html')
 
 
+@app.route('/example')
+def example():
+    return render_template('example.html')
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
