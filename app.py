@@ -23,6 +23,7 @@ if os.environ.get('VIRTUAL_ENV') == '/Users/kitsundere/suldrunswish/venv':
     conn = psycopg2.connect(DATABASE_URL, sslmode='require',
                             database=DATABASE, user=USER, password=PASSWORD)
     app.config['SECRET_KEY'] = SECRET_KEY
+
     print("Login Successful!")
 else:
     app.logger.debug("Starting database connection...")
@@ -199,6 +200,7 @@ def logout():
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
+
     # app.config['DEBUG'] = True
     app.run(threaded=True, port=5000)
 
