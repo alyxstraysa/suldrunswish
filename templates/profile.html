@@ -7,7 +7,13 @@
 <p>This is your profile!</p>
 
 <h2>Account Options</h2>
-<button type="button" id="deleteaccountbutton" class="btn btn-primary btn-sm">Delete Account</button>
+
+<form method="POST">
+    <button class="btn btn-primary btn-sm" type="submit" name="action" value="changepass">Change Password</button>
+    <button class="btn btn-primary btn-sm" type="submit" name="action" value="changeemail">Change Email</button>
+    <button class="btn btn-primary btn-sm" type="submit" name="action" value="deleteaccount">Delete Account</button>
+</form>
+
 
 {% endblock %}
 
