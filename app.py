@@ -145,13 +145,6 @@ def background():
 
 @ app.route('/charlist')
 def charlist():
-    # cur = conn.cursor()
-    # cur.execute(
-    #    """SELECT * FROM inventory"""
-    # )
-    # result = cur.fetchall()
-    # print(result)
-
     URL = "https://mysterious-tor-57369.herokuapp.com/api/characters"
     r = requests.get(URL)
     char_list = r.json()
@@ -163,19 +156,57 @@ def charlist():
 def profile():
     if request.method == 'POST':
         if request.form['action'] == 'changepass':
-            print("Hello there!")
+            return redirect(url_for('changepass'))
         elif request.form['action'] == 'deleteaccount':
+            command = (
+                """
+                DELETE FROM login
+                where username = %s;
+                """
+            )
+            cur = conn.cursor()
+            data = (current_user.username,)
+            cur.execute(command, data)
+            cur.close()
+            conn.commit()
             logout_user()
             return redirect(url_for('index'))
     return render_template('profile.html')
 
 
-@app.route('/example')
+@app.route('/changepass', methods=['GET', 'POST'])
+@login_required
+def changepass():
+    if request.method == 'POST':
+        if request.form['password'] == request.form['confirm']:
+            command = (
+                """
+        UPDATE login
+        SET password = %s
+        WHERE username = %s
+        """
+            )
+
+        data = (generate_password_hash(
+            request.form['password']), current_user.username)
+        cur = conn.cursor()
+        cur.execute(command, data)
+        cur.close()
+        conn.commit()
+
+        logout_user()
+        return redirect(url_for('index'))
+
+    form = RegistrationForm(request.form)
+    return render_template('changepass.html', form=form)
+
+
+@ app.route('/example')
 def example():
     return render_template('example.html')
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@ app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('profile'))
@@ -195,7 +226,7 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@ app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -217,7 +248,7 @@ def register():
     return render_template('register.html', form=form)
 
 
-@app.route('/logout')
+@ app.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for('index'))
