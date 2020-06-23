@@ -5,7 +5,9 @@ from forms import LoginForm
 from markupsafe import escape
 from flask_login import LoginManager, UserMixin, current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
+from werkzeug.security import generate_password_hash, check_password_hash
 
+from register import RegistrationForm
 import os
 import pandas as pd
 import numpy as np
@@ -156,9 +158,15 @@ def charlist():
     return render_template('charlist.html', char_list=char_list)
 
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
+    if request.method == 'POST':
+        if request.form['action'] == 'changepass':
+            print("Hello there!")
+        elif request.form['action'] == 'deleteaccount':
+            logout_user()
+            return redirect(url_for('index'))
     return render_template('profile.html')
 
 
@@ -187,9 +195,26 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('register.html')
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
+        hashed_pass = generate_password_hash(form.password.data)
+
+        command = (
+            """
+            INSERT INTO login (username, password, email)
+            VALUES (%s, %s, %s);
+            """
+        )
+        data = (form.username.data, hashed_pass, form.email.data)
+        cur = conn.cursor()
+        cur.execute(command, data)
+        cur.close()
+        conn.commit()
+        print('User added!')
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
 
 
 @app.route('/logout')
@@ -200,7 +225,6 @@ def logout():
 
 if __name__ == '__main__':
     # Threaded option to enable multiple instances for multiple user access support
-
     # app.config['DEBUG'] = True
     app.run(threaded=True, port=5000)
 
