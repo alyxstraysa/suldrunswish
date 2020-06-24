@@ -130,6 +130,11 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/react')
+def react():
+    return render_template('react.html')
+
+
 @ app.route('/chargen')
 def chargen():
     return render_template('chargen.html')
