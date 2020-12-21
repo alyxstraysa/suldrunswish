@@ -23,10 +23,8 @@ import requests
 import time
 
 # ngrok
-from flask_ngrok import run_with_ngrok
-
+# ~/ngrok http 5000
 app = Flask(__name__)
-# run_with_ngrok(app)
 
 if os.environ.get('VIRTUAL_ENV') == '/Users/kitsundere/suldrunswish/venv':
     print("Working locally...")
@@ -219,7 +217,8 @@ def animerec():
             "https://api.jikan.moe/v3/anime/{anime_id}".format(anime_id=anime_id))
         r_anime = r.json()
         time.sleep(1)
-        return (r_anime['title'], r_anime['synopsis'])
+        return (r_anime['title'], r_anime['synopsis'], r_anime['image_url'],
+                "https://api.jikan.moe/v3/anime/{anime_id}".format(anime_id=anime_id))
 
     prediction = [lookup_anime(anime_id) for anime_id in prediction]
 

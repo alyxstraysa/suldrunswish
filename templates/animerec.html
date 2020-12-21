@@ -3,7 +3,25 @@
 <div class="card">
   <div class="card-body">
     <h5 class="card-title">{{ indiv_pred[0] }}</h5>
-    <p>{{indiv_pred[1]}}</p>
+
+    <div class="row">
+      <div class="col-sm-6">
+        <p>{{indiv_pred[1]}}</p>
+      </div>
+      <div class="col-sm-6">
+        <div class="text-center">
+          <img
+            src="{{indiv_pred[2]}}"
+            class="img-fluid"
+            alt="Responsive image"
+          />
+        </div>
+      </div>
+    </div>
   </div>
+
+  <a href="{{indiv_pred[3]}}" class="btn btn-primary stretched-link"
+    >MAL Page</a
+  >
 </div>
 {% endfor %} {% endblock %}
