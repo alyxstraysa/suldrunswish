@@ -1,5 +1,9 @@
 {% extends "base.html" %} {% set active_page = "animerec" %} {% block content %}
-
-<p>{{prediction}}</p>
-
-{% endblock %}
+{% for indiv_pred in prediction %}
+<div class="card">
+  <div class="card-body">
+    <h5 class="card-title">{{ indiv_pred[0] }}</h5>
+    <p>{{indiv_pred[1]}}</p>
+  </div>
+</div>
+{% endfor %} {% endblock %}

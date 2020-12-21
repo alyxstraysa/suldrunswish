@@ -20,8 +20,13 @@ import pprint
 # machine learning model
 from animegcn.code.main import call_inference
 import requests
+import time
+
+# ngrok
+from flask_ngrok import run_with_ngrok
 
 app = Flask(__name__)
+# run_with_ngrok(app)
 
 if os.environ.get('VIRTUAL_ENV') == '/Users/kitsundere/suldrunswish/venv':
     print("Working locally...")
@@ -134,72 +139,91 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/animerec', methods=['GET', 'POST'])
-def animerec():
+@app.route('/animereclookup', methods=['GET', 'POST'])
+def animereclookup():
     if request.method == 'GET':
-        # fetch user
-        r = requests.get(
-            "https://api.jikan.moe/v3/user/{user}/animelist/all".format(user='exorchids'))
-        r_json = r.json()
-
-        original_anime_list = []
-        for anime in r_json['anime']:
-            original_anime_list.append(anime['mal_id'])
-
-        # remap the original ids
-        anime_dict = {}
-        with open("./animegcn/data/anime/anime.txt") as f:
-            next(f)
-
-            for line in f.readlines():
-                lineModified = line.split(" ")
-                originalID, newID = lineModified[0].strip(
-                    '\n'), lineModified[1].strip('\n')
-                anime_dict[originalID] = newID
-
-        liked_anime = []
-
-        for original_id in original_anime_list:
-            try:
-                liked_anime.append(anime_dict[str(original_id)])
-            except:
-                pass
-
-        liked_anime = [int(x) for x in liked_anime]
-        print(liked_anime)
-
-        # calculate jacard similarity for user
-        def jaccard_similarity(list1, list2):
-            intersection = len(set(list1).intersection(list2))
-            union = len(list1 + list2)
-            return float(intersection) / union
-
-        max_similarity = 0
-        most_similar_user = 0
-
-        with open("./animegcn/data/anime/fulltrain.txt", "r+") as f:
-            for line in f.readlines():
-                lineModified = line.replace("\n", " ").strip().split(" ")
-                userid = lineModified[0]
-                userid = int(userid)
-                items = lineModified[1:]
-                items = [int(x) for x in items]
-
-                js = jaccard_similarity(items, liked_anime)
-
-                if (js > max_similarity):
-                    most_similar_user = userid
-                    max_similarity = js
-
-        print("The most similar user is {user} with a jaccard score of {js:.4f}".format(
-            user=most_similar_user, js=max_similarity))
-
-        # make prediction for specific user
-        prediction = call_inference(most_similar_user)
-
-        return render_template('animerec.html', prediction=prediction)
+        return render_template('animereclookup.html')
     elif request.method == 'POST':
-        pass
+        user = request.form.get('mal_username')
+        print(user)
+        return redirect(url_for('animerec', user=user))
+
+
+@app.route('/animerec')
+def animerec():
+    user = request.args.get('user')
+    print("Analyzing user: {user}".format(user=user))
+    # fetch user
+    r = requests.get(
+        "https://api.jikan.moe/v3/user/{user}/animelist/all".format(
+            user=user))
+    r_json = r.json()
+
+    original_anime_list = []
+    for anime in r_json['anime']:
+        original_anime_list.append(anime['mal_id'])
+
+    # remap the original ids
+    anime_dict = {}
+    with open("./animegcn/data/anime/anime.txt") as f:
+        next(f)
+
+        for line in f.readlines():
+            lineModified = line.split(" ")
+            originalID, newID = lineModified[0].strip(
+                '\n'), lineModified[1].strip('\n')
+            anime_dict[originalID] = newID
+
+    liked_anime = []
+
+    for original_id in original_anime_list:
+        try:
+            liked_anime.append(anime_dict[str(original_id)])
+        except:
+            pass
+
+    liked_anime = [int(x) for x in liked_anime]
+
+    # calculate jacard similarity for user
+    def jaccard_similarity(list1, list2):
+        intersection = len(set(list1).intersection(list2))
+        union = len(list1 + list2)
+        return float(intersection) / union
+
+    max_similarity = 0
+    most_similar_user = 0
+
+    with open("./animegcn/data/anime/fulltrain.txt", "r+") as f:
+        for line in f.readlines():
+            lineModified = line.replace("\n", " ").strip().split(" ")
+            userid = lineModified[0]
+            userid = int(userid)
+            items = lineModified[1:]
+            items = [int(x) for x in items]
+
+            js = jaccard_similarity(items, liked_anime)
+
+            if (js > max_similarity):
+                most_similar_user = userid
+                max_similarity = js
+
+    print("The most similar user is {user} with a jaccard score of {js:.4f}".format(
+        user=most_similar_user, js=max_similarity))
+
+    # make prediction for specific user
+    prediction = call_inference(most_similar_user)
+    prediction = prediction[0:10]
+
+    def lookup_anime(anime_id):
+        r = requests.get(
+            "https://api.jikan.moe/v3/anime/{anime_id}".format(anime_id=anime_id))
+        r_anime = r.json()
+        time.sleep(1)
+        return (r_anime['title'], r_anime['synopsis'])
+
+    prediction = [lookup_anime(anime_id) for anime_id in prediction]
+
+    return render_template('animerec.html', prediction=prediction)
 
 
 @ app.route('/chargen')
@@ -223,8 +247,8 @@ def charlist():
     return render_template('charlist.html', char_list=char_list)
 
 
-@app.route('/profile', methods=['GET', 'POST'])
-@login_required
+@ app.route('/profile', methods=['GET', 'POST'])
+@ login_required
 def profile():
     if request.method == 'POST':
         if request.form['action'] == 'changepass':
@@ -246,8 +270,8 @@ def profile():
     return render_template('profile.html')
 
 
-@app.route('/changepass', methods=['GET', 'POST'])
-@login_required
+@ app.route('/changepass', methods=['GET', 'POST'])
+@ login_required
 def changepass():
     if request.method == 'POST':
         if request.form['password'] == request.form['confirm']:
@@ -326,7 +350,7 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.errorhandler(404)
+@ app.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly
     return render_template('404.html'), 404

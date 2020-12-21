@@ -1,0 +1,8 @@
+{% extends "base.html" %} {% set active_page = "animereclookup" %} {% block
+content %}
+<h1>Please enter a username</h1>
+<form action="/animereclookup" method="post">
+  <input type="text" name="mal_username" />
+  <input type="submit" value="Submit" />
+</form>
+{% endblock %}
