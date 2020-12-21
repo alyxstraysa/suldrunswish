@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "/Users/kitsundere/suldrunswish/venv/bin/python3"
+    "python.pythonPath": "venv/bin/python",
+    "git.ignoreLimitWarning": true
 }
